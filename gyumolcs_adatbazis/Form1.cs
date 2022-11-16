@@ -117,5 +117,81 @@ namespace gyumolcs_adatbazis
             }
             connect.Close();
         }
+
+        private void listBox1_Autok_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (list_adatok.SelectedIndex < 0)
+            {
+                return;
+            }
+            gyumolcs kivalasztott_gyumolcs = (gyumolcs)list_adatok.SelectedItem;
+            textBox1_id.Text = kivalasztott_gyumolcs.Id.ToString();
+            textBox1_nev.Text = kivalasztott_gyumolcs.Nev.ToString();
+            numericUpDown1_egysegar.Value = Convert.ToDecimal(kivalasztott_gyumolcs.Egysegar);
+            numericUpDown1_mennyiseg.Value = Convert.ToDecimal(kivalasztott_gyumolcs.Mennyiseg);
+        }
+
+        private void update_Click(object sender, EventArgs e)
+        {
+            if (list_adatok.SelectedIndex < 0)
+            {
+                MessageBox.Show("Nincs kijelölve gyümölcs!");
+                return;
+            }
+            gyumolcs kivalasztott_gyumolcs = (gyumolcs)list_adatok.SelectedItem;
+            cmd.CommandText = "UPDATE `gyümölcsök` SET nev = @nev, egysegar = @egysegar , mennyiseg = @mennyiseg  WHERE id = @id";
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("@id", textBox1_id.Text);
+            cmd.Parameters.AddWithValue("@nev", textBox1_nev.Text);
+            cmd.Parameters.AddWithValue("@egysegar", numericUpDown1_egysegar.Value);
+            cmd.Parameters.AddWithValue("@mennyiseg", numericUpDown1_egysegar.Value);
+            connect.Open();
+            if (cmd.ExecuteNonQuery() == 1)
+            {
+                MessageBox.Show("Módosítás sikeres");
+                connect.Close();
+                textBox1_id.Text = "";
+                textBox1_nev.Text = "";
+                numericUpDown1_egysegar.Value = numericUpDown1_egysegar.Minimum;
+                numericUpDown1_mennyiseg.Value = numericUpDown1_mennyiseg.Minimum;
+                gyumolcs_list_update();
+            }
+            else
+            {
+                MessageBox.Show("Az adatok Módosítása sikertelen!");
+
+            }
+            if (connect.State == ConnectionState.Open)
+            {
+                connect.Close();
+            }
+        }
+
+        private void delete_Click(object sender, EventArgs e)
+        {
+            if (list_adatok.SelectedIndex < 0)
+            {
+                return;
+            }
+            cmd.CommandText = "DELETE FROM autok WHERE id = @id";
+            cmd.Parameters.Clear();
+            cmd.Parameters.AddWithValue("@id", textBox1_id.Text);
+            connect.Open();
+            connect.Open();
+            if (cmd.ExecuteNonQuery() == 1)
+            {
+                MessageBox.Show("A törlés sikeres!");
+                connect.Close();
+                textBox1_id.Text = "";
+                textBox1_nev.Text = "";
+                numericUpDown1_egysegar.Value = numericUpDown1_egysegar.Minimum;
+                numericUpDown1_mennyiseg.Value = numericUpDown1_mennyiseg.Minimum;
+                gyumolcs_list_update();
+            }
+            else
+            {
+                MessageBox.Show("A törlés sikertelen!");
+            }
+        }
     }
 }
